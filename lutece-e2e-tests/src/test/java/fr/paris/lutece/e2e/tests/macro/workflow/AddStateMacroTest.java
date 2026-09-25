@@ -1,5 +1,6 @@
 package fr.paris.lutece.e2e.tests.macro.workflow;
 
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import fr.paris.lutece.e2e.tests.macro.MacroTest;
@@ -57,6 +58,7 @@ public class AddStateMacroTest extends MacroTest {
             "La creation de l'etat '" + data.name() + "' aurait du rediriger hors de CreateState ; url: "
                 + page.url());
         ctx.states.add(new WorkflowContext.StateRef(data.name(), data.initial()));
+        DeepVerify.state(ctx, data.name(), data.initial());
     }
 
     @Test

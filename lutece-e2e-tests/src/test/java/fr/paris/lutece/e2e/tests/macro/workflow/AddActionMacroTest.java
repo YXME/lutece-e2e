@@ -1,5 +1,6 @@
 package fr.paris.lutece.e2e.tests.macro.workflow;
 
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
 import fr.paris.lutece.e2e.pages.bo.WorkflowEditPage;
 import fr.paris.lutece.e2e.tests.macro.MacroTest;
 import fr.paris.lutece.e2e.tests.macro.WorkflowContext;
@@ -49,6 +50,7 @@ public class AddActionMacroTest extends MacroTest {
             "La creation de l'action '" + data.name() + "' aurait du rediriger hors de CreateAction ; url: "
                 + ctx.page.url());
         ctx.actions.add(new WorkflowContext.ActionRef(data.name()));
+        DeepVerify.action(ctx, data.name());
     }
 
     @Test

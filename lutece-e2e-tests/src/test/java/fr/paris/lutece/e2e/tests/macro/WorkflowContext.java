@@ -11,11 +11,26 @@ import java.util.List;
  * <p>Porte le {@link Page}, le {@code baseUrl}, un suffixe unique par run, et les elements produits :
  * id du workflow, etats et actions (references par leur nom cote UF).</p>
  */
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerificationMode;
+
 public class WorkflowContext {
 
     public final Page page;
     public final String baseUrl;
     public final String runSuffix;
+
+    /**
+     * Instantane du mode « verification approfondie » au moment de la creation du contexte.
+     *
+     * <p>Lu une seule fois ici plutot qu'au fond de chaque brique : l'etat circule ainsi par le
+     * contexte, conformement au principe pose plus haut, et le point de controle se reduit a une
+     * lecture de champ d'instance final. Positionne par {@code DeepVerificationExtension} avant
+     * chaque test, donc toujours a jour a la construction.</p>
+     */
+    public final boolean deepVerify;
+
+    /** Instantane du controle SQL complementaire (sans effet si la base est injoignable). */
+    public final boolean deepVerifySql;
 
     public int workflowId = -1;
     public String workflowName;
@@ -27,6 +42,8 @@ public class WorkflowContext {
         this.page = page;
         this.baseUrl = baseUrl;
         this.runSuffix = runSuffix;
+        this.deepVerify = DeepVerificationMode.isEnabled();
+        this.deepVerifySql = DeepVerificationMode.isSqlEnabled();
     }
 
     /** Etat d'un workflow (reference par son nom dans les formulaires d'action). */

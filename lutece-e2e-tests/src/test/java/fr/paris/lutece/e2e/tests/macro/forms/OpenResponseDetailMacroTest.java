@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
 
 /**
  * Brique macro : ouvrir le detail de la premiere reponse depuis la multivue.
@@ -38,6 +39,8 @@ public class OpenResponseDetailMacroTest extends MacroTest {
     @Step("Ouvrir le detail de la premiere reponse")
     public static void run(FormsContext ctx) {
         boolean opened = openFirstResponseDetail(ctx);
+        DeepVerify.multiviewShowsResponse(ctx, opened,
+            () -> OpenResponseDetailMacroTest.openFirstResponseDetail(ctx));
         Assumptions.assumeTrue(opened,
             "aucune reponse a ouvrir dans la multivue (multivue vide) : detail non pilotable");
 

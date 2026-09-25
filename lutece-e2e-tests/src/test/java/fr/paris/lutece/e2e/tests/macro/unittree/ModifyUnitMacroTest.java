@@ -1,5 +1,6 @@
 package fr.paris.lutece.e2e.tests.macro.unittree;
 
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
 import com.microsoft.playwright.Page;
 import fr.paris.lutece.e2e.tests.macro.MacroTest;
 import fr.paris.lutece.e2e.tests.macro.UnittreeContext;
@@ -39,6 +40,7 @@ public class ModifyUnitMacroTest extends MacroTest {
         Assertions.assertFalse(page.url().contains("ModifyUnit.jsp"),
             "La modification de l'unite aurait du rediriger hors de ModifyUnit ; url: " + page.url());
         u.label = newLabel;
+        DeepVerify.unit(ctx, u.id, newLabel);
     }
 
     @Test

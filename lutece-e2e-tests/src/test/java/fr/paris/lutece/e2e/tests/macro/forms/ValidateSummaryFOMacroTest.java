@@ -1,5 +1,6 @@
 package fr.paris.lutece.e2e.tests.macro.forms;
 
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
@@ -87,6 +88,8 @@ public class ValidateSummaryFOMacroTest extends MacroTest {
         if (responseId != null) {
             ctx.lastResponseId = responseId;
         }
+        DeepVerify.responseSubmitted(ctx);
+        DeepVerify.responseInWorkflow(ctx);
     }
 
     /** Extrait l'id de reponse de l'URL (plusieurs conventions possibles), ou {@code null}. */

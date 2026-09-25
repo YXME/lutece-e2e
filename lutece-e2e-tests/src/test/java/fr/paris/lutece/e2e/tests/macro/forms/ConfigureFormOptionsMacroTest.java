@@ -1,5 +1,6 @@
 package fr.paris.lutece.e2e.tests.macro.forms;
 
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
@@ -94,6 +95,7 @@ public class ConfigureFormOptionsMacroTest extends MacroTest {
                 page.locator("input[type='checkbox'][name='backupEnabled']").first().isChecked(),
                 "L'option de sauvegarde des reponses incompletes devrait etre active apres enregistrement");
         }
+        DeepVerify.formOptions(ctx, data);
     }
 
     /**

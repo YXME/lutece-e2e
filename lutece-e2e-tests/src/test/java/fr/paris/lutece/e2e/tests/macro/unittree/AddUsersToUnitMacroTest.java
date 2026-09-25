@@ -1,5 +1,6 @@
 package fr.paris.lutece.e2e.tests.macro.unittree;
 
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import fr.paris.lutece.e2e.tests.macro.MacroTest;
@@ -43,6 +44,7 @@ public class AddUsersToUnitMacroTest extends MacroTest {
 
         Assertions.assertFalse(page.url().contains("AddUsers.jsp"),
             "L'affectation aurait du rediriger hors de AddUsers ; url: " + page.url());
+        DeepVerify.userInUnit(ctx, u.id, data.userId());
     }
 
     @Test

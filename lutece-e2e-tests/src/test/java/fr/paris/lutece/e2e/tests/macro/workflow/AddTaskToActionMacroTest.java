@@ -1,5 +1,6 @@
 package fr.paris.lutece.e2e.tests.macro.workflow;
 
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
@@ -44,24 +45,17 @@ public class AddTaskToActionMacroTest extends MacroTest {
         Assertions.assertFalse(ctx.actions.isEmpty(),
             "Une action doit exister (ctx.actions) avant d'ajouter une tache");
 
-        // Se placer sur la page d'edition du workflow (les liens d'action lisent id_workflow de l'URL).
-        WorkflowSupport.navigate(ctx, WorkflowSupport.WF + "ModifyWorkflow.jsp?id_workflow=" + ctx.workflowId);
+        // Ouvrir l'onglet Actions par l'URL : un clic sur l'onglet depend de l'etat du composant, la
+        // navigation directe non — et c'est la seule facon de rendre les actions reellement visibles.
+        WorkflowSupport.openActionsPane(ctx);
+        String actionName = ctx.actions.get(0).name;
+        int idAction = WorkflowSupport.actionId(ctx.page, actionName);
+        Assertions.assertTrue(idAction > 0,
+            "L'action '" + actionName + "' devrait etre listee dans l'onglet Actions du workflow "
+            + ctx.workflowId + " avant d'y ajouter une tache");
+
+        WorkflowSupport.navigate(ctx, WorkflowSupport.WF + "ModifyAction.jsp?id_action=" + idAction);
         WorkflowEditPage edit = new WorkflowEditPage(ctx.page, ctx.baseUrl);
-
-        // Rendre les actions visibles : cliquer sur l'onglet Actions uniquement s'il existe.
-        Locator actionsTab = ctx.page.getByRole(AriaRole.TAB,
-            new Page.GetByRoleOptions().setName("Actions"));
-        if (actionsTab.count() > 0 && actionsTab.first().isVisible()) {
-            edit.clickActionsTab();
-        }
-
-        // Ouvrir ModifyAction.jsp : lien porteur de token, on garde sa presence pour eviter un hang.
-        Locator modifyActionLink = ctx.page.getByRole(AriaRole.LINK,
-            new Page.GetByRoleOptions().setName("Modifier l'action"));
-        boolean actionModifiable = modifyActionLink.count() > 0 && modifyActionLink.first().isVisible();
-        Assumptions.assumeTrue(actionModifiable,
-            "Aucun lien 'Modifier l'action' visible : impossible d'ouvrir la configuration des taches, test ignore");
-        edit.clickModifyAction();
 
         // Garder le select "Nouvelle tache" (avec l'option demandee) et le bouton "Inserer".
         Locator taskSelect = ctx.page.getByLabel("Nouvelle tâche");
@@ -85,6 +79,7 @@ public class AddTaskToActionMacroTest extends MacroTest {
             || WorkflowSupport.isTextVisible(ctx.page, data.taskTypeKey());
         Assertions.assertTrue(taskPresent,
             "La tache '" + data.taskTypeKey() + "' devrait apparaitre sur la page de l'action apres insertion");
+        DeepVerify.taskOnAction(ctx, data.taskTypeKey());
     }
 
     @Test

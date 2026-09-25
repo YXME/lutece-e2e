@@ -1,5 +1,6 @@
 package fr.paris.lutece.e2e.tests.macro.forms;
 
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
 import fr.paris.lutece.e2e.pages.bo.FormsCreationPage;
 import fr.paris.lutece.e2e.pages.bo.FormsListPage;
 import fr.paris.lutece.e2e.tests.macro.FormsContext;
@@ -52,6 +53,7 @@ public class CreateFormMacroTest extends MacroTest {
             "Le formulaire '" + title + "' devrait apparaitre dans la liste avec un id_form");
         ctx.formId = id;
         ctx.formTitle = title;
+        DeepVerify.form(ctx, title);
     }
 
     @Test

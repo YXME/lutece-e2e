@@ -5,12 +5,22 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import fr.paris.lutece.e2e.tests.macro.FormsContext;
 import fr.paris.lutece.e2e.tests.macro.MacroTest;
+import fr.paris.lutece.e2e.tests.macro.WorkflowContext;
+import fr.paris.lutece.e2e.tests.macro.data.ActionDataSet;
 import fr.paris.lutece.e2e.tests.macro.data.FormDataSet;
 import fr.paris.lutece.e2e.tests.macro.data.PublishDataSet;
 import fr.paris.lutece.e2e.tests.macro.data.QuestionDataSet;
 import fr.paris.lutece.e2e.tests.macro.data.QuestionType;
 import fr.paris.lutece.e2e.tests.macro.data.ResponseActionDataSet;
+import fr.paris.lutece.e2e.tests.macro.data.StateDataSet;
 import fr.paris.lutece.e2e.tests.macro.data.StepDataSet;
+import fr.paris.lutece.e2e.tests.macro.data.WorkflowDataSet;
+import fr.paris.lutece.e2e.tests.macro.data.WorkflowRefDataSet;
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
+import fr.paris.lutece.e2e.tests.macro.workflow.ActivateWorkflowMacroTest;
+import fr.paris.lutece.e2e.tests.macro.workflow.AddActionMacroTest;
+import fr.paris.lutece.e2e.tests.macro.workflow.AddStateMacroTest;
+import fr.paris.lutece.e2e.tests.macro.workflow.CreateWorkflowMacroTest;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Step;
@@ -40,12 +50,17 @@ import java.util.regex.Pattern;
 @Tag("brick")
 public class RunWorkflowActionOnResponseMacroTest extends MacroTest {
 
+    /** Libelle de l'action provisionnee par le scenario autonome. */
+    private static final String ACTION_LABEL = "Traiter";
+
     private static final Pattern CONFIRM = Pattern.compile(
         "^(Oui|OK|Confirmer|Valider|Valider l'action)$", Pattern.CASE_INSENSITIVE);
 
     @Step("Declencher une action de workflow sur la reponse")
     public static void run(FormsContext ctx, ResponseActionDataSet data) {
         boolean opened = OpenResponseDetailMacroTest.openFirstResponseDetail(ctx);
+        DeepVerify.multiviewShowsResponse(ctx, opened,
+            () -> OpenResponseDetailMacroTest.openFirstResponseDetail(ctx));
         Assumptions.assumeTrue(opened,
             "aucune reponse sur laquelle declencher une action (multivue vide)");
 
@@ -73,6 +88,7 @@ public class RunWorkflowActionOnResponseMacroTest extends MacroTest {
             "La session admin ne devrait pas etre perdue apres l'action de workflow");
         Assertions.assertTrue(actionConfirmed(page),
             "L'action de workflow devrait produire une confirmation ou un changement d'etat visible");
+        DeepVerify.responseStateAfterAction(ctx, data.actionLabel());
     }
 
     private static void confirmIfPresent(Page page) {
@@ -99,14 +115,29 @@ public class RunWorkflowActionOnResponseMacroTest extends MacroTest {
     @Test
     @DisplayName("Declencher une action de workflow sur une reponse (auto-provisionnement + soumission FO)")
     void standalone() {
-        FormsContext ctx = newLoggedInContext();
+        String suffix = newSuffix();
+        login();
+
+        // Un workflow actif, associe au formulaire : sans cela l'action n'apparait jamais sur le
+        // detail de la reponse et la brique ne peut pas exercer son objet.
+        WorkflowContext wf = new WorkflowContext(page, BASE_URL, suffix);
+        CreateWorkflowMacroTest.run(wf, WorkflowDataSet.defaults().withName("Instruction"));
+        AddStateMacroTest.run(wf, StateDataSet.initial("A instruire"));
+        AddStateMacroTest.run(wf, StateDataSet.of("Traitee"));
+        AddActionMacroTest.run(wf, ActionDataSet.of(ACTION_LABEL, 0, 1));
+        ActivateWorkflowMacroTest.run(wf);
+
+        FormsContext ctx = new FormsContext(page, BASE_URL, suffix);
+        ctx.workflowId = wf.workflowId;
+        ctx.workflowName = wf.workflowName;
+
         CreateFormMacroTest.run(ctx, FormDataSet.defaults());
         CreateStepMacroTest.run(ctx, StepDataSet.finalStep("Etape unique"));
         AddQuestionMacroTest.run(ctx, QuestionDataSet.of(QuestionType.TEXT, "Question texte"));
+        AssociateWorkflowMacroTest.run(ctx, WorkflowRefDataSet.of(wf.workflowName));
         PublishFormMacroTest.run(ctx, PublishDataSet.defaults());
-        // Provisionnement best-effort d'une reponse. Sans workflow associe, l'action sera absente et
-        // run() sautera proprement via Assumptions.
+
         OpenMultiviewMacroTest.submitOneFoResponse(ctx);
-        run(ctx, ResponseActionDataSet.defaults());
+        run(ctx, ResponseActionDataSet.of(ACTION_LABEL));
     }
 }

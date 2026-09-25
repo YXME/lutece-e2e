@@ -22,7 +22,7 @@ import java.nio.file.Paths;
  * Note: les tests PER_CLASS qui gèrent leur propre contexte (override createContextAndPage)
  * doivent appeler startTracing() après avoir créé le contexte pour bénéficier du tracing.
  */
-@ExtendWith(ScreenshotOnFailureExtension.class)
+@ExtendWith({ ScreenshotOnFailureExtension.class, DeepVerificationExtension.class })
 public abstract class BaseTest {
 
     protected static Playwright playwright;

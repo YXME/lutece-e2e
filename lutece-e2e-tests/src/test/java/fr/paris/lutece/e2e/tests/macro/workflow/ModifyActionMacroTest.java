@@ -1,5 +1,6 @@
 package fr.paris.lutece.e2e.tests.macro.workflow;
 
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import fr.paris.lutece.e2e.tests.macro.MacroTest;
@@ -44,10 +45,11 @@ public class ModifyActionMacroTest extends MacroTest {
         Page page = ctx.page;
         String newName = data.name();
 
-        WorkflowSupport.navigate(ctx, WorkflowSupport.WF + "ModifyWorkflow.jsp?id_workflow=" + ctx.workflowId);
-        int idAction = resolveActionId(page, target.name);
-        Assumptions.assumeTrue(idAction > 0,
-            "Lien id_action introuvable pour l'action '" + target.name + "' : renommage non pilotable en l'etat");
+        WorkflowSupport.openActionsPane(ctx);
+        int idAction = WorkflowSupport.actionId(page, target.name);
+        Assertions.assertTrue(idAction > 0,
+            "L'action '" + target.name + "' devrait etre listee dans l'onglet Actions du workflow "
+            + ctx.workflowId + " avant d'etre renommee");
 
         WorkflowSupport.navigate(ctx, WorkflowSupport.WF + "ModifyAction.jsp?id_action=" + idAction);
         Locator nameInput = page.locator("input[name='name']");
@@ -64,23 +66,7 @@ public class ModifyActionMacroTest extends MacroTest {
             "Le renommage de l'action aurait du rediriger hors de ModifyAction ; url: " + page.url());
 
         target.name = newName;
-    }
-
-    /**
-     * Resout id_action en privilegiant le lien portant le nom de l'action, sinon le premier lien id_action.
-     * Retourne -1 si aucun lien exploitable n'est present.
-     */
-    private static int resolveActionId(Page page, String actionName) {
-        Locator named = page.locator("a[href*='id_action=']:has-text('" + actionName + "')").first();
-        Locator link = named.count() > 0 ? named : page.locator("a[href*='id_action=']").first();
-        if (link.count() == 0) {
-            return -1;
-        }
-        String href = link.getAttribute("href");
-        if (href == null || !href.contains("id_action=")) {
-            return -1;
-        }
-        return Integer.parseInt(href.split("id_action=")[1].split("&")[0].split("#")[0]);
+        DeepVerify.actionRenamed(ctx, idAction, newName);
     }
 
     private static void dismissAdminMessage(Page page) {

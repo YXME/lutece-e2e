@@ -1,5 +1,6 @@
 package fr.paris.lutece.e2e.tests.macro.workflow;
 
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
 import com.microsoft.playwright.Locator;
 import fr.paris.lutece.e2e.pages.bo.WorkflowListPage;
 import fr.paris.lutece.e2e.tests.macro.MacroTest;
@@ -52,6 +53,7 @@ public class ActivateWorkflowMacroTest extends MacroTest {
             Assertions.assertTrue(disableLink.first().isVisible(),
                 "Le workflow actif devrait exposer un lien de desactivation");
         }
+        DeepVerify.workflowActive(ctx);
     }
 
     @Test

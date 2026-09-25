@@ -16,11 +16,26 @@ import java.util.List;
  * via cet objet. En suite, le contexte est threade ; en solo, la brique s'auto-provisionne en
  * appelant les briques amont sur un contexte frais.</p>
  */
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerificationMode;
+
 public class FormsContext {
 
     public final Page page;
     public final String baseUrl;
     public final String runSuffix;
+
+    /**
+     * Instantane du mode « verification approfondie » au moment de la creation du contexte.
+     *
+     * <p>Lu une seule fois ici plutot qu'au fond de chaque brique : l'etat circule ainsi par le
+     * contexte, conformement au principe pose plus haut, et le point de controle se reduit a une
+     * lecture de champ d'instance final. Positionne par {@code DeepVerificationExtension} avant
+     * chaque test, donc toujours a jour a la construction.</p>
+     */
+    public final boolean deepVerify;
+
+    /** Instantane du controle SQL complementaire (sans effet si la base est injoignable). */
+    public final boolean deepVerifySql;
 
     /** Identifiant du formulaire courant (-1 si aucun). */
     public int formId = -1;
@@ -43,6 +58,8 @@ public class FormsContext {
         this.page = page;
         this.baseUrl = baseUrl;
         this.runSuffix = runSuffix;
+        this.deepVerify = DeepVerificationMode.isEnabled();
+        this.deepVerifySql = DeepVerificationMode.isSqlEnabled();
     }
 
     // === References mutables (mises a jour par les briques) ===

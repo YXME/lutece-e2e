@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
 
 /**
  * Brique macro : ajouter une etape a un formulaire.
@@ -38,6 +39,7 @@ public class CreateStepMacroTest extends MacroTest {
         int stepId = MacroSupport.extractStepId(ctx, ctx.formId, data.title());
         Assertions.assertTrue(stepId > 0, "L'etape '" + data.title() + "' devrait exister apres creation");
         ctx.steps.add(new FormsContext.StepRef(stepId, data.title(), data.initial(), data.isFinal()));
+        DeepVerify.step(ctx, data.title());
     }
 
     @Test

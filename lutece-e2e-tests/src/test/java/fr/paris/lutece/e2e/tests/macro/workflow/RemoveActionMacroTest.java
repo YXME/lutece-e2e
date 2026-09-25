@@ -43,10 +43,11 @@ public class RemoveActionMacroTest extends MacroTest {
         WorkflowContext.ActionRef target = ctx.actions.get(0);
         Page page = ctx.page;
 
-        WorkflowSupport.navigate(ctx, WorkflowSupport.WF + "ModifyWorkflow.jsp?id_workflow=" + ctx.workflowId);
-        int idAction = resolveActionId(page, target.name);
-        Assumptions.assumeTrue(idAction > 0,
-            "Lien id_action introuvable pour l'action '" + target.name + "' : suppression non pilotable en l'etat");
+        WorkflowSupport.openActionsPane(ctx);
+        int idAction = WorkflowSupport.actionId(page, target.name);
+        Assertions.assertTrue(idAction > 0,
+            "L'action '" + target.name + "' devrait etre listee dans l'onglet Actions du workflow "
+            + ctx.workflowId + " avant d'etre supprimee");
 
         // Page de confirmation AdminMessage : confirmer via le premier bouton submit ou le lien DoRemoveAction.
         WorkflowSupport.navigate(ctx, WorkflowSupport.WF + "ConfirmRemoveAction.jsp?id_action=" + idAction);
@@ -55,26 +56,12 @@ public class RemoveActionMacroTest extends MacroTest {
             "Bouton/lien de confirmation absent pour l'action '" + target.name + "' : scenario ignore");
         page.waitForLoadState();
 
-        // Verifier que l'action a disparu de la page d'edition du workflow.
-        WorkflowSupport.navigate(ctx, WorkflowSupport.WF + "ModifyWorkflow.jsp?id_workflow=" + ctx.workflowId);
-        Assertions.assertEquals(0,
-            page.locator("a[href*='id_action=']:has-text('" + target.name + "')").count(),
-            "L'action '" + target.name + "' ne devrait plus apparaitre apres suppression");
+        // Verifier que l'action a disparu de l'onglet Actions.
+        WorkflowSupport.openActionsPane(ctx);
+        Assertions.assertNull(WorkflowSupport.actionRow(page, target.name),
+            "L'action '" + target.name + "' ne devrait plus etre listee apres suppression");
 
         ctx.actions.remove(target);
-    }
-
-    /** Resout id_action via le lien portant le nom de l'action cible. Retourne -1 si absent. */
-    private static int resolveActionId(Page page, String actionName) {
-        Locator link = page.locator("a[href*='id_action=']:has-text('" + actionName + "')").first();
-        if (link.count() == 0) {
-            return -1;
-        }
-        String href = link.getAttribute("href");
-        if (href == null || !href.contains("id_action=")) {
-            return -1;
-        }
-        return Integer.parseInt(href.split("id_action=")[1].split("&")[0].split("#")[0]);
     }
 
     private static boolean confirmRemoval(Page page) {

@@ -1,5 +1,6 @@
 package fr.paris.lutece.e2e.tests.macro.unittree;
 
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.SelectOption;
@@ -55,6 +56,7 @@ public class MoveUnitMacroTest extends MacroTest {
         Assertions.assertFalse(page.url().contains("MoveSubTree.jsp"),
             "Le deplacement aurait du rediriger hors de MoveSubTree ; url: " + page.url());
         moved.parentId = newParent.id;
+        DeepVerify.unitParent(ctx, moved.id, moved.label, newParent.id);
     }
 
     @Test

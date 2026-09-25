@@ -146,7 +146,7 @@ public class AddValidationControlMacroTest extends MacroTest {
      * Resout l'id (compositeId) d'une question a partir de son titre sur la page de gestion des questions.
      * Retourne -1 si introuvable.
      */
-    static int resolveQuestionId(FormsContext ctx, int stepId, String title) {
+    public static int resolveQuestionId(FormsContext ctx, int stepId, String title) {
         Page page = ctx.page;
         MacroSupport.navigate(ctx, MacroSupport.FORMS + "ManageQuestions.jsp?view=manageQuestions&id_step=" + stepId);
 
@@ -188,7 +188,7 @@ public class AddValidationControlMacroTest extends MacroTest {
      * Renvoie l'id du dernier controle (id le plus eleve = le plus recent) liste dans la vue de gestion
      * correspondante ({@code manageControl} pour VALIDATION, {@code manageConditionControl} pour CONDITIONAL).
      */
-    static int extractLastControlId(FormsContext ctx, int stepId, int idTarget, String controlType) {
+    public static int extractLastControlId(FormsContext ctx, int stepId, int idTarget, String controlType) {
         boolean conditional = "CONDITIONAL".equals(controlType);
         String view = conditional ? "manageConditionControl" : "manageControl";
         String editView = conditional ? "view=modifyConditionControl" : "view=modifyControl";

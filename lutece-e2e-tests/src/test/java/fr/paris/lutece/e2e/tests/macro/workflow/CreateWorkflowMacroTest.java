@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
 
 /**
  * Brique macro : creer un workflow.
@@ -42,6 +43,7 @@ public class CreateWorkflowMacroTest extends MacroTest {
             "Le workflow '" + name + "' devrait apparaitre dans la liste avec un id_workflow");
         ctx.workflowId = id;
         ctx.workflowName = name;
+        DeepVerify.workflow(ctx, name);
     }
 
     @Test

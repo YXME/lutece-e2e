@@ -1,5 +1,6 @@
 package fr.paris.lutece.e2e.tests.macro.forms;
 
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
@@ -78,6 +79,7 @@ public class CreateTransitionMacroTest extends MacroTest {
         if (transitionId != null) {
             ctx.transitionIds.add(transitionId);
         }
+        DeepVerify.transition(ctx, data.fromStepIndex(), data.toStepIndex());
     }
 
     /**

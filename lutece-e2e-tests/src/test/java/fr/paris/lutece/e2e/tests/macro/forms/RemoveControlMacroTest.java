@@ -1,5 +1,6 @@
 package fr.paris.lutece.e2e.tests.macro.forms;
 
+import fr.paris.lutece.e2e.tests.macro.verify.DeepVerify;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
@@ -83,6 +84,7 @@ public class RemoveControlMacroTest extends MacroTest {
             "Le controle " + controlId + " ne devrait plus etre liste apres suppression");
 
         ctx.controlIds.remove(Integer.valueOf(controlId));
+        DeepVerify.controlRemoved(ctx, controlId);
     }
 
     /**
